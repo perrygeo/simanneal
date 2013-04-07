@@ -15,6 +15,11 @@ Simulated annealing is used to find a close-to-optimal solution amongst an extre
 For a state to be accepted, it must either be a drop in energy (i.e. an improvement in the objective metric) or 
 it must be within the bounds of the current "temperature"; increasing energy is accepted to a 
 lesser extent as the process goes on. In this way, we avoid getting trapped by "local minima" early in the process.  
+
+From the [British Journal of Radiology](http://bjr.birjournals.org/content/76/910/678/F6.expansion.html)
+![BJR](http://bjr.birjournals.org/content/76/910/678/F6.medium.gif)
+
+
 Think of traveling from the top of a mountain to the ocean - even though your goal is to drop to sea level, you may have to climb some small inclines along the way in order to get there.
 
 Simulated annealing is inspired by the mettalurgic process of annealing whereby metals must be cooled at a regular schedule in order to settle into their lowest energy state. 
@@ -36,14 +41,14 @@ function to randomly "move" the state ("Randomly add or remove a property from t
 
 ## How to optimize a system with simulated annealing:
  
-1. Define a format for describing the state of the system.
+Define a format for describing the state of the system.
 
 ```
 all_parcels = [745, 234, ...]
 state = []  # a list of parcel ids; a subset of all_parcels
 ```
 
-2. Define a function to calculate the energy of a state.
+Define a function to calculate the energy of a state.
 
 ```
 def energy(state):
@@ -61,7 +66,7 @@ def energy(state):
     return energy
 ```
 
-3. Define a function to make a random change to a state.
+Define a function to make a random change to a state.
 
 ```
 def move(state):
@@ -77,7 +82,7 @@ def move(state):
         state.append(huc)
 ```
  
-4. Run the automatic annealer which will attempt to choose reasonable values
+Run the automatic annealer which will attempt to choose reasonable values
     for maximum and minimum temperatures and then anneal the solution.
 
 ```
@@ -89,7 +94,6 @@ state, e = annealer.anneal(state, schedule['tmax'], schedule['tmin'],
 print state  # the "final" solution
 ```
 
-## Example
 
 For a working example similar to the conservation problem described above, see the `example/` directory.
 
