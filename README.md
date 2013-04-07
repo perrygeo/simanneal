@@ -26,7 +26,7 @@ Simulated annealing is inspired by the mettalurgic process of annealing whereby 
 
 ## Theoretical Example
 
-Let's say you want to buy up some land to save you favorite animals from development.
+Let's say you want to buy up some land to save your favorite creatures from development pressures.
 You create a list of species, each with a specific conservation target: 
 We want to conserve at least 200 acres of beaver habitat, 400 acres of snowy plover habitat, etc.
 
