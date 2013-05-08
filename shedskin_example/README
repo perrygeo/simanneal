@@ -1,0 +1,17 @@
+A refactored version to fix scope and typing in order to work with shedskin.
+
+To install shedskin:
+
+wget https://shedskin.googlecode.com/files/shedskin-0.9.3.tgz
+tar -xzvf shedskin-0.9.3.tgz
+cd shedskin-0.9.3
+sudo python setup.py install
+sudo apt-get install -y libgc-dev libgc1c2 libpcre++-dev libpcre++0
+
+Then to compile py to cpp:
+
+shedskin anneal.py
+
+Finally, compile the C++ to a native binary:
+
+make
