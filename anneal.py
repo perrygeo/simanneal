@@ -302,13 +302,14 @@ if __name__ == '__main__':
         return e
     
     # Start with the cities listed in random order
-    state = cities.keys()
-    random.shuffle(state)
-    
+    randState = cities.keys()
+    random.shuffle(randState)
+
     # Minimize the distance to be traveled by simulated annealing with a
     # manually chosen temperature schedule
     annealer = Annealer(route_energy, route_move)
-    state, e = annealer.anneal(state, 10000000, 0.01, 18000*len(state), 9)
+    state, e = annealer.anneal(randState, 10000000, 0.01,
+        18000 * len(randState), 9)
     while state[0] != 'New York City':
         state = state[1:] + state[:1]  # rotate NYC to start
     print "%i mile route:" % route_energy(state)
@@ -317,7 +318,10 @@ if __name__ == '__main__':
     
     # Minimize the distance to be traveled by simulated annealing with an
     # automatically chosen temperature schedule
-    state, e = annealer.auto(state, 4)
+    autoSchedule = annealer.auto(randState, 4)
+    state, e = annealer.anneal(randState, autoSchedule['tmax'],
+        autoSchedule['tmin'], autoSchedule['steps'],
+	math.log(autoSchedule['tmax'] / autoSchedule['tmin']) / math.log(10))
     while state[0] != 'New York City':
         state = state[1:] + state[:1]  # rotate NYC to start
     print "%i mile route:" % route_energy(state)
