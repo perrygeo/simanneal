@@ -2,7 +2,7 @@
 
 This module performs [simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) to find a the optimal state of a system. It is inspired by the mettalurgic process of annealing whereby metals must be cooled at a regular schedule in order to settle into their lowest energy state. 
 
-Simulated annealing is used to find a close-to-optimal solution among an extremely large (but finite) set of potential solutions. It is particularly useful for combinatorial optimization problems with unknown solution spaces defined by complex objective functions that rely on external data. 
+Simulated annealing is used to find a close-to-optimal solution among an extremely large (but finite) set of potential solutions. It is particularly useful for [combinatorial optimization](http://en.wikipedia.org/wiki/Combinatorial_optimization) problems defined by complex objective functions that rely on external data. 
 
 The process involves::
 
