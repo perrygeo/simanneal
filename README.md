@@ -1,101 +1,115 @@
 # Python module for simulated annealing
 
-This module performs [simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) to find a state of a system that minimizes its energy.
+This module performs [simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) to find a state of a system that minimizes its energy. It is inspired by the mettalurgic process of annealing whereby metals must be cooled at a regular schedule in order to settle into their lowest energy state. 
 
 Simulated annealing is used to find a close-to-optimal solution amongst an extremely large (but finite) set of potential solutions. The process involves::
 
-1. A random _move_  altering the state 
-2. Assess the _energy_ of the new state using an objective metric
+1. Randomly **move** or alter the **state** 
+2. Assess the **energy** of the new state using an objective function
 3. Compare the energy to the previous state and 
    decide whether to accept the new solution or
-   reject it. 
+   reject it based on the current *temperature*.
 4. Repeat until you have converged on an acceptable answer
 
 
-For a state to be accepted, it must either be a drop in energy (i.e. an improvement in the objective metric) or 
-it must be within the bounds of the current "temperature"; increasing energy is accepted to a 
-lesser extent as the process goes on. In this way, we avoid getting trapped by "local minima" early in the process.  
+For a move to be accepted, it must meet one of two requirements
 
-From the [British Journal of Radiology](http://bjr.birjournals.org/content/76/910/678/F6.expansion.html)
-![BJR](http://bjr.birjournals.org/content/76/910/678/F6.medium.gif)
+* The move must cause a decrease in state energy (i.e. an improvement in the objective function)
+* The move increases the state energy (i.e. a slightly worse solution) but is within the bounds of the temperature is still accepted. The temperature exponetially decreases as the algorithm progresses. In this way, we avoid getting trapped by "local minima" early in the process but start to hone in on a viable solution by the end. 
 
 
-Think of traveling from the top of a mountain to the ocean - even though your goal is to drop to sea level, you may have to climb some small inclines along the way in order to get there.
+## Example: Travelling Salesman Problem
 
-Simulated annealing is inspired by the mettalurgic process of annealing whereby metals must be cooled at a regular schedule in order to settle into their lowest energy state. 
+The quintessential discrete optimization problem is the [travelling salesman problem](http://en.wikipedia.org/wiki/Travelling_salesman_problem). 
 
-## Theoretical Example
+> Given a list of locations, what is the shortest possible route 
+> that hits each location and returns to the starting city?
 
-Let's say you want to buy up some land to save your favorite creatures from development pressures.
-You create a list of species, each with a specific conservation target: 
-We want to conserve at least 200 acres of beaver habitat, 400 acres of snowy plover habitat, etc.
+To put it in terms of our simulated annealing framework:
+* The **state** is an ordered list of locations to visit
+* The **move** shuffles two cities in the list
+* The **energy** of a give state is the distance travelled
 
-There are 100 parcels for sale in the area. You want to buy up a number of parcels to meet your conservation
-targets but want to do so at the lowest possible cost.
+## Quickstart
 
-If you had a few parcels in mind, you could potentially calculate all the possible combinations but, with 100 parcels, there are 9.3326215444×10<sup>157</sup> combinations! So that's where simulated annealing helps.
-
-You could write an objective function to calculate the "energy" for each possible solution ("Total cost of all included parcels plus a penalty for any conservation targets that were missed") and a 
-function to randomly "move" the state ("Randomly add or remove a property from the set") and you could then run simulated annealing to go through the solution space and converge on the optimal set of parcels that would have the lowest "energy" (i.e. the set of parcels that met the most of your conservation objectives with the lowest cost)
-
-
-## How to optimize a system with simulated annealing:
- 
-Define a format for describing the state of the system.
+To define our problem, we create a class that inherits from `simanneal.Annealer`
 
 ```
-all_parcels = [745, 234, ...]
-state = []  # a list of parcel ids; a subset of all_parcels
+from simanneal import Annealer
+class TravellingSalesmanProblem(Annealer):
+    """Test annealer with a travelling salesman problem."""
 ```
 
-Define a function to calculate the energy of a state.
+Within that class, we define two required methods. First, we define the move:
 
 ```
-def energy(state):
-    """
-    The objective Function... calculates the 'energy' of the state
-    Incorporate costs and penalties for not meeting species targets. 
-    """
-
-    energy = sum([get_cost(parcel) for parcel in state])
-
-    for s in species:
-        if pct < 1.0: # if missed target, ie total < target
-            energy += get_penalty(s)
-    
-    return energy
+    def move(self):
+        """Swaps two cities in the route."""
+        a = random.randint(0, len(self.state) - 1)
+        b = random.randint(0, len(self.state) - 1)
+        self.state[a], self.state[b] = self.state[b], self.state[a]
 ```
 
-Define a function to make a random change to a state.
-
+Then we define how energy is computed (also known as the *objective function*):
 ```
-def move(state):
-    """ 
-    Select random parcel
-    then add parcel OR remove it. 
-    """
-    huc = random.choice(all_parcels)
-
-    if huc in state:
-        state.remove(huc)
-    else:
-        state.append(huc)
-```
- 
-Run the automatic annealer which will attempt to choose reasonable values
-    for maximum and minimum temperatures and then anneal the solution.
-
-```
-from anneal import Annealer
-annealer = Annealer(energy, move)
-schedule = annealer.auto(state, minutes=1)
-state, e = annealer.anneal(state, schedule['tmax'], schedule['tmin'], 
-                            schedule['steps'], updates=6)
-print state  # the "final" solution
+    def energy(self):
+        """Calculates the length of the route."""
+        e = 0
+        for i in range(len(self.state)):
+            e += self.distance(cities[self.state[i - 1]],
+                          cities[self.state[i]])
+        return e
 ```
 
+Note that both of these methods have access to `self.state` which tracks the current state of the process. 
 
-For a working example similar to the conservation problem described above, see the `example/` directory.
+So with our problem specified, we can construct a ` TravellingSalesmanProblem` instance and provide it a starting state
+
+```
+initial_state = ['New York', 'Los Angeles', 'Boston', 'Houston']
+tsp = TravellingSalesmanProblem(initial_state)
+```
+
+And run it
+```
+itinerary, miles = tsp.anneal()
+```
+
+See [examples/salesman.py](https://github.com/perrygeo/simanneal/blob/master/examples/salesman.py) to see the complete implementation.
+
+## Annealing parameters
+
+Getting the annealing algorithm to work effectively and quickly is a matter of tuning parameters. The defaults are:
+
+    Tmax = 25000.0  # Max (starting) temperature
+    Tmin = 2.5      # Min (ending) temperature
+    steps = 50000   # Number of iterations
+    updates = 100   # Number of updates (by default an update prints to stdout)
+
+These can vary greatly depending on your objective function and solution space.
+
+ A good rule of thumb is that your initial temperature `Tmax` should be set to accept roughly 98% of the moves and that the final temperature `Tmin` should be low enough that the solution does not improve much, if at all. 
+
+The number of `steps` can influence the results; if there are not enough iterations to adequately explore the search space it can get trapped at a local minimum. 
+
+The number of updates doesn't affect the results but can be useful for examining the progress. The default update method (`Annealer.update`) prints a table to stdout and includes the current temperature, state energy, the percentage of moves accepted and improved and elapsed and remaining time. You can override `.update` and provide your own custom reporting mechanism to e.g. graphically plot the progress.
+
+If you want to specify them manually, the are just attributes of the `Annealer` instance. 
+```
+tsp.Tmax = 12000.0
+...
+```
+However, you can use the `.auto` method which attempts to explore the search space to determine some decent starting values and assess how long each iteration takes. This allows you to specify roughly how long you're willing to wait for results.
+
+```
+auto_schedule = tsp.auto(minutes=1) 
+# {'tmin': ..., 'tmax': ..., 'steps': ...}
+
+tsp.set_schedule(auto_schedule)
+itinerary, miles = tsp.anneal()
+```
+
+
 
 ## Notes
 
