@@ -127,7 +127,7 @@ Copying an object in Python is not always straightforward or performant. The sta
 In order to facilitate flexibility, you can specify the `copy_strategy` attribute
 which defines one of:
 * `deepcopy`: uses `copy.deepcopy(object)`
-* `slice`: uses object[:]
+* `slice`: uses `object[:]`
 * `method`: uses `object.copy()`
 
 If you want to implement your own custom copy mechanism, you can override the `copy_state` method.
@@ -138,9 +138,9 @@ If you want to implement your own custom copy mechanism, you can override the `c
 2. Some effort has been made to increase performance but this is nowhere near as fast as optimized solutions written in other low-level languages. On the other hand, this is a very flexible, Python-based solution that can be used for rapidly 
 experimenting with a computational problem with minimal overhead. 
 3. Using PyPy instead of CPython can yield substantial increases in performance.
-4. For certain domains, there are simulated annealing techniques that are highly customized and optimized for the particular domain
+4. For certain problems, there are simulated annealing techniques that are highly customized and optimized for the particular domain
     * For conservation planning, check out [Marxan](http://www.uq.edu.au/marxan/) which is designed to prioritize conservation resources according to multiple planning objectives
-    * For forestry and timber harvest scheduling, check out [Harvest Scheduler](https://github.com/Ecotrust/harvest-scheduler) which optimizes forest operations over time to meet multiple objectives. 
+    * For forest management and timber harvest scheduling, check out [Harvest Scheduler](https://github.com/Ecotrust/harvest-scheduler) which optimizes forestry operations over space and time to meet multiple objectives. 
 5. Most times, you'll want to run through multiple repetions of the annealing runs. It is helpful to see, for example, how similar the states between 20 different runs. If the same or very similar state is acheived 20 times, it's likely that you've adequeately converged on a nearly-optimal answer.
 
 
