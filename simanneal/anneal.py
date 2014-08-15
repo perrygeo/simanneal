@@ -113,12 +113,8 @@ class Annealer:
         # Note initial state
         T = self.Tmax
         E = self.energy()
-        # copy
-        # prevState = self.state[:]
         prevState = self.copy_state(self.state)
         prevEnergy = E
-        # copy
-        #bestState = self.state[:]
         bestState = self.copy_state(self.state)
         bestEnergy = E
         trials, accepts, improves = 0, 0, 0
@@ -136,8 +132,6 @@ class Annealer:
             trials += 1
             if dE > 0.0 and math.exp(-dE / T) < random.random():
                 # Restore previous state
-                # copy
-                # state = prevState[:]
                 self.state = self.copy_state(prevState)
                 E = prevEnergy
             else:
@@ -145,13 +139,9 @@ class Annealer:
                 accepts += 1
                 if dE < 0.0:
                     improves += 1
-                # copy
-                # prevState = self.state[:]
                 prevState = self.copy_state(self.state)
                 prevEnergy = E
                 if E < bestEnergy:
-                    # copy
-                    # bestState = self.state[:]
                     bestState = self.copy_state(self.state)
                     bestEnergy = E
             if self.updates > 1:
@@ -178,8 +168,6 @@ class Annealer:
             """Anneals a system at constant temperature and returns the state,
             energy, rate of acceptance, and rate of improvement."""
             E = self.energy()
-            # copy
-            # prevState = self.state[:]
             prevState = self.copy_state(self.state)
             prevEnergy = E
             accepts, improves = 0, 0
@@ -188,16 +176,12 @@ class Annealer:
                 E = self.energy()
                 dE = E - prevEnergy
                 if dE > 0.0 and math.exp(-dE / T) < random.random():
-                    # copy
-                    # self.state = prevState[:]
                     self.state = self.copy_state(prevState)
                     E = prevEnergy
                 else:
                     accepts += 1
                     if dE < 0.0:
                         improves += 1
-                    # copy
-                    # prevState = self.state[:]
                     prevState = self.copy_state(self.state)
                     prevEnergy = E
             return E, float(accepts) / steps, float(improves) / steps
