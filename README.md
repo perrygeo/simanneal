@@ -2,7 +2,7 @@
 
 This module performs [simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) to find a state of a system that minimizes its energy. It is inspired by the mettalurgic process of annealing whereby metals must be cooled at a regular schedule in order to settle into their lowest energy state. 
 
-Simulated annealing is used to find a close-to-optimal solution amongst an extremely large (but finite) set of potential solutions. It is particulalry useful for combinatorial optimization problems with unknown solution spaces defined by complex objective functions that rely on external data. 
+Simulated annealing is used to find a close-to-optimal solution amongst an extremely large (but finite) set of potential solutions. It is particularly useful for combinatorial optimization problems with unknown solution spaces defined by complex objective functions that rely on external data. 
 
 The process involves::
 
@@ -33,6 +33,13 @@ To put it in terms of our simulated annealing framework:
 * The **energy** of a give state is the distance travelled
 
 ## Quickstart
+
+Install it first
+```
+pip install simanneal  # from pypi
+
+pip install -e git+https://github.com/perrygeo/simanneal.git  # latest from github
+```
 
 To define our problem, we create a class that inherits from `simanneal.Annealer`
 
