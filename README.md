@@ -2,20 +2,22 @@
 
 This module performs [simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) to find a state of a system that minimizes its energy. It is inspired by the mettalurgic process of annealing whereby metals must be cooled at a regular schedule in order to settle into their lowest energy state. 
 
-Simulated annealing is used to find a close-to-optimal solution amongst an extremely large (but finite) set of potential solutions. The process involves::
+Simulated annealing is used to find a close-to-optimal solution amongst an extremely large (but finite) set of potential solutions. It is particulalry useful for combinatorial optimization problems with unknown solution spaces defined by complex objective functions that rely on external data. 
+
+The process involves::
 
 1. Randomly **move** or alter the **state** 
 2. Assess the **energy** of the new state using an objective function
 3. Compare the energy to the previous state and 
    decide whether to accept the new solution or
-   reject it based on the current *temperature*.
+   reject it based on the current **temperature**.
 4. Repeat until you have converged on an acceptable answer
 
 
 For a move to be accepted, it must meet one of two requirements
 
-* The move must cause a decrease in state energy (i.e. an improvement in the objective function)
-* The move increases the state energy (i.e. a slightly worse solution) but is within the bounds of the temperature is still accepted. The temperature exponetially decreases as the algorithm progresses. In this way, we avoid getting trapped by "local minima" early in the process but start to hone in on a viable solution by the end. 
+* The move causes a decrease in state energy (i.e. an improvement in the objective function)
+* The move increases the state energy (i.e. a slightly worse solution) but is within the bounds of the temperature. The temperature exponetially decreases as the algorithm progresses. In this way, we avoid getting trapped by local minima early in the process but start to hone in on a viable solution by the end. 
 
 
 ## Example: Travelling Salesman Problem
@@ -109,7 +111,19 @@ tsp.set_schedule(auto_schedule)
 itinerary, miles = tsp.anneal()
 ```
 
+## Implementation Details
 
+The simulated annealing algorithm requires that we track state (current, previous, best) and thus means we need to copy the `self.state` frequently.
+
+Copying an object in Python is not always straightforward or performant. The standard library provides a `copy.deepcopy()` method to copy arbitrary python objects but it is very expensive. Certain objects can be copied by more efficient means: lists can be sliced and dictionaries can use their own .copy method, etc.
+
+In order to facilitate flexibility, you can specify the `copy_strategy` attribute
+which defines one of:
+* `deepcopy`: uses `copy.deepcopy(object)`
+* `slice`: uses object[:]
+* `method`: uses `object.copy()`
+
+If you want to implement your own custom copy mechanism, you can override the `copy_state` method.
 
 ## Notes
 
