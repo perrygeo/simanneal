@@ -18,6 +18,7 @@ class TravellingSalesmanProblem(Annealer):
     """Test annealer with a travelling salesman problem.
     """
     
+    # pass extra data (the distance matrix) into the constructor
     def __init__(self, state, distance_matrix):
         self.distance_matrix = distance_matrix
         super(TravellingSalesmanProblem, self).__init__(state)  # important! 
