@@ -22,7 +22,7 @@ def time_string(seconds):
     return '%4i:%02i:%02i' % (h, m, s)
 
 
-class Annealer:
+class Annealer(object):
 
     """Performs simulated annealing by calling functions to calculate
     energy and make moves on a state.  The temperature schedule for

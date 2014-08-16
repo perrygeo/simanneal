@@ -118,6 +118,20 @@ tsp.set_schedule(auto_schedule)
 itinerary, miles = tsp.anneal()
 ```
 
+## Extra data dependencies
+
+You might have noticed that the `energy` function above requires a `cities` dict 
+that is presumably defined in the enclosing scope. This is not necessarily a good
+design pattern. The dependency on additional data can be made explicit by passing 
+them into the constructor like so
+
+    # pass extra data (the distance matrix) into the constructor
+    def __init__(self, state, distance_matrix):
+        self.distance_matrix = distance_matrix
+        super(TravellingSalesmanProblem, self).__init__(state)  # important!
+
+The last line (calling init on the super class) is critical. 
+
 ## Implementation Details
 
 The simulated annealing algorithm requires that we track state (current, previous, best) and thus means we need to copy the `self.state` frequently.

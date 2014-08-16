@@ -17,6 +17,10 @@ class TravellingSalesmanProblem(Annealer):
 
     """Test annealer with a travelling salesman problem.
     """
+    
+    def __init__(self, state, distance_matrix):
+        self.distance_matrix = distance_matrix
+        super(TravellingSalesmanProblem, self).__init__(state)  # important! 
 
     def move(self):
         """Swaps two cities in the route."""
@@ -28,8 +32,7 @@ class TravellingSalesmanProblem(Annealer):
         """Calculates the length of the route."""
         e = 0
         for i in range(len(self.state)):
-            e += distance(cities[self.state[i - 1]],
-                               cities[self.state[i]])
+            e += self.distance_matrix[self.state[i-1]][self.state[i]]
         return e
 
 
@@ -60,9 +63,23 @@ if __name__ == '__main__':
         'Baltimore': (39.28, 76.62)
     }
 
+    # initial state, a randomly-ordered itinerary
     init_state = list(cities.keys())
+    random.shuffle(init_state)
 
-    tsp = TravellingSalesmanProblem(init_state)
+    # create a distance matrix
+    distance_matrix = {}
+    for ka, va in cities.items():
+        distance_matrix[ka] = {}
+        for kb, vb in cities.items():
+            if kb == ka:
+                distance_matrix[ka][kb] = 0.0
+            else:
+                distance_matrix[ka][kb] = distance(va, vb)
+
+    tsp = TravellingSalesmanProblem(init_state, distance_matrix)
+    # since our state is just a list, slice is the fastest way to copy
+    tsp.copy_strategy = "slice"  
     state, e = tsp.anneal()
 
     while state[0] != 'New York City':
