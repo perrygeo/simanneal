@@ -43,7 +43,7 @@ class Annealer(object):
         """Takes the output from `auto` and sets the attributes
         """
         self.Tmax = schedule['tmax']
-        self.Tmax = schedule['tmin']
+        self.Tmin = schedule['tmin']
         self.steps = int(schedule['steps'])
 
     def copy_state(self, state):
