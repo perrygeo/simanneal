@@ -31,7 +31,7 @@ class TravellingSalesmanProblem(Annealer):
 
     def energy(self):
         """Calculates the length of the route."""
-        e = 0
+        e = self.distance_matrix[self.state[0]][self.state[len(self.state)-1]] 
         for i in range(len(self.state)):
             e += self.distance_matrix[self.state[i-1]][self.state[i]]
         return e
