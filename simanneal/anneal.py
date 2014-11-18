@@ -84,13 +84,15 @@ class Annealer(object):
         elapsed = time.time() - self.start
         if step == 0:
             print(' Temperature        Energy    Accept   Improve     Elapsed   Remaining')
-            print('%12.2f  %12.2f                      %s            ' % \
+            sys.stdout.write('\r%12.2f  %12.2f                      %s            ' % \
                 (T, E, time_string(elapsed)))
+            sys.stdout.flush()
         else:
             remain = (self.steps - step) * (elapsed / step)
-            print('%12.2f  %12.2f  %7.2f%%  %7.2f%%  %s  %s' % \
+            sys.stdout.write('\r%12.2f  %12.2f  %7.2f%%  %7.2f%%  %s  %s' % \
                 (T, E, 100.0 * acceptance, 100.0 * improvement,
-                    time_string(elapsed), time_string(remain)))
+                    time_string(elapsed), time_string(remain))),
+            sys.stdout.flush()
 
     def anneal(self):
         """Minimizes the energy of a system by simulated annealing.
@@ -149,6 +151,9 @@ class Annealer(object):
                     self.update(
                         step, T, E, accepts / trials, improves / trials)
                     trials, accepts, improves = 0, 0, 0
+
+        # line break after progress output
+        print('')
 
         # Return best state and energy
         return bestState, bestEnergy
