@@ -155,6 +155,6 @@ experimenting with a computational problem with minimal overhead.
 4. For certain problems, there are simulated annealing techniques that are highly customized and optimized for the particular domain
     * For conservation planning, check out [Marxan](http://www.uq.edu.au/marxan/) which is designed to prioritize conservation resources according to multiple planning objectives
     * For forest management and timber harvest scheduling, check out [Harvest Scheduler](https://github.com/Ecotrust/harvest-scheduler) which optimizes forestry operations over space and time to meet multiple objectives. 
-5. Most times, you'll want to run through multiple repetions of the annealing runs. It is helpful to see, for example, how similar the states between 20 different runs. If the same or very similar state is acheived 20 times, it's likely that you've adequeately converged on a nearly-optimal answer.
+5. Most times, you'll want to run through multiple repetions of the annealing runs. It is helpful to examine the states between 20 different runs. If the same or very similar state is acheived 20 times, it's likely that you've adequeately converged on a nearly-optimal answer.
 
 
