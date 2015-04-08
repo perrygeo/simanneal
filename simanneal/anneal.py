@@ -7,6 +7,7 @@ import math
 import sys
 import time
 import random
+import signal
 
 
 def round_figures(x, n):
@@ -34,10 +35,17 @@ class Annealer(object):
     steps = 50000
     updates = 100
     copy_strategy = 'deepcopy'
+    user_exit = False
 
     def __init__(self, initial_state):
         self.initial_state = initial_state
         self.state = self.copy_state(initial_state)
+	signal.signal(signal.SIGINT, self.set_user_exit)
+
+    def set_user_exit(self, signum, frame):
+	"""Raises the user_exit flag, further iterations are stopped
+	"""
+	self.user_exit = True
 
     def set_schedule(self, schedule):
         """Takes the output from `auto` and sets the attributes
@@ -125,7 +133,7 @@ class Annealer(object):
             self.update(step, T, E, None, None)
 
         # Attempt moves to new states
-        while step < self.steps:
+        while step < self.steps and not self.user_exit:
             step += 1
             T = self.Tmax * math.exp(Tfactor * step / self.steps)
             self.move()
@@ -232,5 +240,6 @@ class Annealer(object):
         elapsed = time.time() - self.start
         duration = round_figures(int(60.0 * minutes * step / elapsed), 2)
 
+	print('') # New line after auto() output
         # Don't perform anneal, just return params
         return {'tmax': Tmax, 'tmin': Tmin, 'steps': duration}
