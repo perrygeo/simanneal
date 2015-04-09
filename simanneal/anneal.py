@@ -8,6 +8,9 @@ import sys
 import time
 import random
 import signal
+import pickle
+import datetime
+import abc
 
 
 def round_figures(x, n):
@@ -30,22 +33,50 @@ class Annealer(object):
     annealing may be provided manually or estimated automatically.
     """
 
+    __metaclass__ = abc.ABCMeta
     Tmax = 25000.0
     Tmin = 2.5
     steps = 50000
     updates = 100
     copy_strategy = 'deepcopy'
     user_exit = False
+    save_state_on_exit = True
 
-    def __init__(self, initial_state):
-        self.initial_state = initial_state
-        self.state = self.copy_state(initial_state)
-	signal.signal(signal.SIGINT, self.set_user_exit)
+    def __init__(self, initial_state=None, load_state=None):
+        if initial_state:
+            self.state = self.copy_state(initial_state)
+        elif load_state:
+            with open(load_state, 'rb') as fh:
+                self.state = pickle.load(fh)
+        else:
+            raise ValueError('No valid values supplied for neither \
+            initial_state nor load_state')
+
+        signal.signal(signal.SIGINT, self.set_user_exit)
+
+    def save_state(self, fname=None):
+        """Saves state"""
+        if not fname:
+            date = datetime.datetime.now().isoformat().split(".")[0]
+            fname = date + "_energy_" + str(self.energy()) + ".state"
+        print("Saving state to: %s" % fname)
+        with open(fname, "w") as fh:
+            pickle.dump(self.state, fh)
+
+    @abc.abstractmethod
+    def move(self):
+        """Create a state change"""
+        pass
+
+    @abc.abstractmethod
+    def energy(self):
+        """Calculate state's energy"""
+        pass
 
     def set_user_exit(self, signum, frame):
-	"""Raises the user_exit flag, further iterations are stopped
-	"""
-	self.user_exit = True
+        """Raises the user_exit flag, further iterations are stopped
+        """
+        self.user_exit = True
 
     def set_schedule(self, schedule):
         """Takes the output from `auto` and sets the attributes
@@ -68,7 +99,6 @@ class Annealer(object):
             return state[:]
         elif self.copy_strategy == 'method':
             return state.copy()
-
 
     def update(self, step, T, E, acceptance, improvement):
         """Prints the current temperature, energy, acceptance rate,
@@ -98,8 +128,8 @@ class Annealer(object):
         else:
             remain = (self.steps - step) * (elapsed / step)
             sys.stdout.write('\r%12.2f  %12.2f  %7.2f%%  %7.2f%%  %s  %s' % \
-                (T, E, 100.0 * acceptance, 100.0 * improvement,
-                    time_string(elapsed), time_string(remain))),
+            (T, E, 100.0 * acceptance, 100.0 * improvement,\
+            time_string(elapsed), time_string(remain))),
             sys.stdout.flush()
 
     def anneal(self):
@@ -163,6 +193,9 @@ class Annealer(object):
         # line break after progress output
         print('')
 
+        self.state = self.copy_state(bestState)
+        if self.save_state_on_exit:
+            self.save_state()
         # Return best state and energy
         return bestState, bestEnergy
 
@@ -240,6 +273,6 @@ class Annealer(object):
         elapsed = time.time() - self.start
         duration = round_figures(int(60.0 * minutes * step / elapsed), 2)
 
-	print('') # New line after auto() output
+        print('') # New line after auto() output
         # Don't perform anneal, just return params
         return {'tmax': Tmax, 'tmin': Tmin, 'steps': duration}
