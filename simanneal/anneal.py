@@ -59,7 +59,6 @@ class Annealer(object):
         if not fname:
             date = datetime.datetime.now().isoformat().split(".")[0]
             fname = date + "_energy_" + str(self.energy()) + ".state"
-        print("Saving state to: %s" % fname)
         with open(fname, "w") as fh:
             pickle.dump(self.state, fh)
 
@@ -122,14 +121,14 @@ class Annealer(object):
         elapsed = time.time() - self.start
         if step == 0:
             print(' Temperature        Energy    Accept   Improve     Elapsed   Remaining')
-            sys.stdout.write('\r%12.2f  %12.2f                      %s            ' % \
-                (T, E, time_string(elapsed)))
+            sys.stdout.write('\r%12.2f  %12.2f                      %s            ' %
+                             (T, E, time_string(elapsed)))
             sys.stdout.flush()
         else:
             remain = (self.steps - step) * (elapsed / step)
-            sys.stdout.write('\r%12.2f  %12.2f  %7.2f%%  %7.2f%%  %s  %s' % \
-            (T, E, 100.0 * acceptance, 100.0 * improvement,\
-            time_string(elapsed), time_string(remain))),
+            sys.stdout.write('\r%12.2f  %12.2f  %7.2f%%  %7.2f%%  %s  %s' %
+                             (T, E, 100.0 * acceptance, 100.0 * improvement,
+                              time_string(elapsed), time_string(remain))),
             sys.stdout.flush()
 
     def anneal(self):
@@ -273,6 +272,6 @@ class Annealer(object):
         elapsed = time.time() - self.start
         duration = round_figures(int(60.0 * minutes * step / elapsed), 2)
 
-        print('') # New line after auto() output
+        print('')  # New line after auto() output
         # Don't perform anneal, just return params
         return {'tmax': Tmax, 'tmin': Tmin, 'steps': duration}
