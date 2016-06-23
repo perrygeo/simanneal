@@ -57,7 +57,7 @@ class Annealer(object):
     def save_state(self, fname=None):
         """Saves state"""
         if not fname:
-            date = datetime.datetime.now().isoformat().split(".")[0]
+            date = datetime.datetime.now().strftime("%Y-%m-%dT%Hh%Mm%Ss")
             fname = date + "_energy_" + str(self.energy()) + ".state"
         print("Saving state to: %s" % fname)
         with open(fname, "w") as fh:
