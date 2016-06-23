@@ -43,7 +43,7 @@ class Annealer(object):
     save_state_on_exit = True
 
     def __init__(self, initial_state=None, load_state=None):
-        if initial_state:
+        if len(initial_state) > 0:
             self.state = self.copy_state(initial_state)
         elif load_state:
             with open(load_state, 'rb') as fh:
