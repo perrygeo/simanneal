@@ -43,7 +43,7 @@ class Annealer(object):
     save_state_on_exit = True
 
     def __init__(self, initial_state=None, load_state=None):
-        if initial_state:
+        if len(initial_state) > 0:
             self.state = self.copy_state(initial_state)
         elif load_state:
             with open(load_state, 'rb') as fh:
@@ -57,7 +57,7 @@ class Annealer(object):
     def save_state(self, fname=None):
         """Saves state"""
         if not fname:
-            date = datetime.datetime.now().isoformat().split(".")[0]
+            date = datetime.datetime.now().strftime("%Y-%m-%dT%Hh%Mm%Ss")
             fname = date + "_energy_" + str(self.energy()) + ".state"
         print("Saving state to: %s" % fname)
         with open(fname, "w") as fh:
