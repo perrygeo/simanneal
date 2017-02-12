@@ -41,6 +41,7 @@ class Annealer(object):
     copy_strategy = 'deepcopy'
     user_exit = False
     save_state_on_exit = True
+    best_state = None
 
     def __init__(self, initial_state=None, load_state=None):
         if len(initial_state) > 0:
@@ -99,8 +100,19 @@ class Annealer(object):
         elif self.copy_strategy == 'method':
             return state.copy()
 
-    def update(self, step, T, E, acceptance, improvement):
-        """Prints the current temperature, energy, acceptance rate,
+    def update(self, *args, **kwargs):
+        """Wrapper for internal update.
+
+        If you override the self.update method,
+        you can chose to call the self.default_update method
+        from your own Annealer.
+        """
+        self.default_update(self, *args, **kwargs)
+
+    def default_update(self, step, T, E, acceptance, improvement):
+        """Default update, outputs to stderr.
+
+        Prints the current temperature, energy, acceptance rate,
         improvement rate, elapsed time, and remaining time.
 
         The acceptance rate indicates the percentage of moves since the last
@@ -184,8 +196,9 @@ class Annealer(object):
                 if E < bestEnergy:
                     bestState = self.copy_state(self.state)
                     bestEnergy = E
+                    self.best_state = bestState
             if self.updates > 1:
-                if step // updateWavelength > (step - 1) // updateWavelength:
+                if (step // updateWavelength) > ((step - 1) // updateWavelength):
                     self.update(
                         step, T, E, accepts / trials, improves / trials)
                     trials, accepts, improves = 0, 0, 0
