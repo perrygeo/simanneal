@@ -59,7 +59,7 @@ class Annealer(object):
         if not fname:
             date = datetime.datetime.now().strftime("%Y-%m-%dT%Hh%Mm%Ss")
             fname = date + "_energy_" + str(self.energy()) + ".state"
-        with open(fname, "w") as fh:
+        with open(fname, "wb") as fh:
             pickle.dump(self.state, fh)
 
     @abc.abstractmethod
