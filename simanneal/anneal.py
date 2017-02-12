@@ -44,7 +44,7 @@ class Annealer(object):
     best_state = None
 
     def __init__(self, initial_state=None, load_state=None):
-        if len(initial_state) > 0:
+        if initial_state:
             self.state = self.copy_state(initial_state)
         elif load_state:
             with open(load_state, 'rb') as fh:
