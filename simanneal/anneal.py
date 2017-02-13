@@ -41,9 +41,10 @@ class Annealer(object):
     copy_strategy = 'deepcopy'
     user_exit = False
     save_state_on_exit = True
+    best_state = None
 
     def __init__(self, initial_state=None, load_state=None):
-        if len(initial_state) > 0:
+        if initial_state:
             self.state = self.copy_state(initial_state)
         elif load_state:
             with open(load_state, 'rb') as fh:
@@ -59,7 +60,7 @@ class Annealer(object):
         if not fname:
             date = datetime.datetime.now().strftime("%Y-%m-%dT%Hh%Mm%Ss")
             fname = date + "_energy_" + str(self.energy()) + ".state"
-        with open(fname, "w") as fh:
+        with open(fname, "wb") as fh:
             pickle.dump(self.state, fh)
 
     @abc.abstractmethod
@@ -83,6 +84,7 @@ class Annealer(object):
         self.Tmax = schedule['tmax']
         self.Tmin = schedule['tmin']
         self.steps = int(schedule['steps'])
+        self.updates = int(schedule['updates'])
 
     def copy_state(self, state):
         """Returns an exact copy of the provided state
@@ -99,8 +101,19 @@ class Annealer(object):
         elif self.copy_strategy == 'method':
             return state.copy()
 
-    def update(self, step, T, E, acceptance, improvement):
-        """Prints the current temperature, energy, acceptance rate,
+    def update(self, *args, **kwargs):
+        """Wrapper for internal update.
+
+        If you override the self.update method,
+        you can chose to call the self.default_update method
+        from your own Annealer.
+        """
+        self.default_update(self, *args, **kwargs)
+
+    def default_update(self, step, T, E, acceptance, improvement):
+        """Default update, outputs to stderr.
+
+        Prints the current temperature, energy, acceptance rate,
         improvement rate, elapsed time, and remaining time.
 
         The acceptance rate indicates the percentage of moves since the last
@@ -120,16 +133,17 @@ class Annealer(object):
 
         elapsed = time.time() - self.start
         if step == 0:
-            print(' Temperature        Energy    Accept   Improve     Elapsed   Remaining')
-            sys.stdout.write('\r%12.2f  %12.2f                      %s            ' %
-                             (T, E, time_string(elapsed)))
-            sys.stdout.flush()
+            print(' Temperature        Energy    Accept   Improve     Elapsed   Remaining',
+                  file=sys.stderr)
+            print('\r%12.5f  %12.2f                      %s            ' %
+                  (T, E, time_string(elapsed)), file=sys.stderr, end="\r"),
+            sys.stderr.flush()
         else:
             remain = (self.steps - step) * (elapsed / step)
-            sys.stdout.write('\r%12.2f  %12.2f  %7.2f%%  %7.2f%%  %s  %s' %
-                             (T, E, 100.0 * acceptance, 100.0 * improvement,
-                              time_string(elapsed), time_string(remain))),
-            sys.stdout.flush()
+            print('\r%12.5f  %12.2f  %7.2f%%  %7.2f%%  %s  %s\r' %
+                  (T, E, 100.0 * acceptance, 100.0 * improvement,
+                   time_string(elapsed), time_string(remain)), file=sys.stderr, end="\r"),
+            sys.stderr.flush()
 
     def anneal(self):
         """Minimizes the energy of a system by simulated annealing.
@@ -156,6 +170,7 @@ class Annealer(object):
         prevEnergy = E
         bestState = self.copy_state(self.state)
         bestEnergy = E
+        self.best_state = bestState
         trials, accepts, improves = 0, 0, 0
         if self.updates > 0:
             updateWavelength = self.steps / self.updates
@@ -183,8 +198,9 @@ class Annealer(object):
                 if E < bestEnergy:
                     bestState = self.copy_state(self.state)
                     bestEnergy = E
+                    self.best_state = bestState
             if self.updates > 1:
-                if step // updateWavelength > (step - 1) // updateWavelength:
+                if (step // updateWavelength) > ((step - 1) // updateWavelength):
                     self.update(
                         step, T, E, accepts / trials, improves / trials)
                     trials, accepts, improves = 0, 0, 0
