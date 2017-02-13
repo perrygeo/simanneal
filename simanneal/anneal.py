@@ -84,6 +84,7 @@ class Annealer(object):
         self.Tmax = schedule['tmax']
         self.Tmin = schedule['tmin']
         self.steps = int(schedule['steps'])
+        self.updates = int(schedule['updates'])
 
     def copy_state(self, state):
         """Returns an exact copy of the provided state
@@ -169,6 +170,7 @@ class Annealer(object):
         prevEnergy = E
         bestState = self.copy_state(self.state)
         bestEnergy = E
+        self.best_state = bestState
         trials, accepts, improves = 0, 0, 0
         if self.updates > 0:
             updateWavelength = self.steps / self.updates
