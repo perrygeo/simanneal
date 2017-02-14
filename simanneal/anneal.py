@@ -168,9 +168,8 @@ class Annealer(object):
         E = self.energy()
         prevState = self.copy_state(self.state)
         prevEnergy = E
-        bestState = self.copy_state(self.state)
-        bestEnergy = E
-        self.best_state = bestState
+        self.best_state = self.copy_state(self.state)
+        self.best_energy = E
         trials, accepts, improves = 0, 0, 0
         if self.updates > 0:
             updateWavelength = self.steps / self.updates
@@ -195,10 +194,9 @@ class Annealer(object):
                     improves += 1
                 prevState = self.copy_state(self.state)
                 prevEnergy = E
-                if E < bestEnergy:
-                    bestState = self.copy_state(self.state)
-                    bestEnergy = E
-                    self.best_state = bestState
+                if E < self.best_energy:
+                    self.best_state = self.copy_state(self.state)
+                    self.best_energy = E
             if self.updates > 1:
                 if (step // updateWavelength) > ((step - 1) // updateWavelength):
                     self.update(
@@ -208,11 +206,11 @@ class Annealer(object):
         # line break after progress output
         print('')
 
-        self.state = self.copy_state(bestState)
+        self.state = self.copy_state(self.best_state)
         if self.save_state_on_exit:
             self.save_state()
         # Return best state and energy
-        return bestState, bestEnergy
+        return self.best_state, self.best_energy
 
     def auto(self, minutes, steps=2000):
         """Minimizes the energy of a system by simulated annealing with
