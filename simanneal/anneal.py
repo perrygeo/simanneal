@@ -108,7 +108,7 @@ class Annealer(object):
         you can chose to call the self.default_update method
         from your own Annealer.
         """
-        self.default_update(self, *args, **kwargs)
+        self.default_update(*args, **kwargs)
 
     def default_update(self, step, T, E, acceptance, improvement):
         """Default update, outputs to stderr.
