@@ -1,0 +1,16 @@
+language: python
+sudo: false
+python:
+  - "2.7"
+  - "3.6"
+  - "pypy"
+before_install:
+  - "pip install -U pip"
+  - "pip install wheel"
+  - "pip install -r requirements-dev.txt"
+install:
+  - "pip install -e ."
+script:
+  - py.test -vv --cov simanneal --cov-report term-missing tests
+after_success:
+  - coveralls

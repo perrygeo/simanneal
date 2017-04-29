@@ -17,11 +17,11 @@ class TravellingSalesmanProblem(Annealer):
 
     """Test annealer with a travelling salesman problem.
     """
-    
+
     # pass extra data (the distance matrix) into the constructor
     def __init__(self, state, distance_matrix):
         self.distance_matrix = distance_matrix
-        super(TravellingSalesmanProblem, self).__init__(state)  # important! 
+        super(TravellingSalesmanProblem, self).__init__(state)  # important!
 
     def move(self):
         """Swaps two cities in the route."""
@@ -79,13 +79,15 @@ if __name__ == '__main__':
                 distance_matrix[ka][kb] = distance(va, vb)
 
     tsp = TravellingSalesmanProblem(init_state, distance_matrix)
+    tsp.steps = 100000
     # since our state is just a list, slice is the fastest way to copy
-    tsp.copy_strategy = "slice"  
+    tsp.copy_strategy = "slice"
     state, e = tsp.anneal()
 
     while state[0] != 'New York City':
         state = state[1:] + state[:1]  # rotate NYC to start
+
+    print()
     print("%i mile route:" % e)
     for city in state:
         print("\t", city)
-
