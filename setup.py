@@ -1,8 +1,4 @@
 #!/usr/bin/env/python
-import sys
-import os
-import warnings
-
 try:
     from setuptools import setup
 except ImportError:
@@ -17,14 +13,23 @@ useful for [combinatorial optimization](http://en.wikipedia.org/wiki/Combinatori
 problems defined by complex objective functions that rely on external data.
 """
 
-setup(name='simanneal',
-      version='0.3.1',
-      description='Simulated Annealing in Python',
-      license='BSD',
-      author='Matthew Perry',
-      author_email='perrygeo@gmail.com',
-      url='https://github.com/perrygeo/simanneal',
-      long_description=LONG_DESCRIPTION,
-      packages=['simanneal'],
-      install_requires=[],
-)
+# Parse the version from the fiona module.
+with open('simanneal/__init__.py') as f:
+    for line in f:
+        if line.find("__version__") >= 0:
+            version = line.split("=")[1].strip()
+            version = version.strip('"')
+            version = version.strip("'")
+            break
+
+setup(
+    name='simanneal',
+    version=version,
+    description='Simulated Annealing in Python',
+    license='BSD',
+    author='Matthew Perry',
+    author_email='perrygeo@gmail.com',
+    url='https://github.com/perrygeo/simanneal',
+    long_description=LONG_DESCRIPTION,
+    packages=['simanneal'],
+    install_requires=[])
