@@ -1,0 +1,2 @@
+script
+py.test -vv --cov simanneal --cov-report term-missing tests/

@@ -1,16 +1,16 @@
+from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-from __future__ import absolute_import
 from __future__ import unicode_literals
+import abc
 import copy
+import datetime
 import math
-import sys
-import time
+import pickle
 import random
 import signal
-import pickle
-import datetime
-import abc
+import sys
+import time
 
 
 def round_figures(x, n):
@@ -34,21 +34,26 @@ class Annealer(object):
     """
 
     __metaclass__ = abc.ABCMeta
+
+    # defaults
     Tmax = 25000.0
     Tmin = 2.5
     steps = 50000
     updates = 100
     copy_strategy = 'deepcopy'
     user_exit = False
-    save_state_on_exit = True
+    save_state_on_exit = False
+
+    # placeholders
     best_state = None
+    best_energy = None
+    start = None
 
     def __init__(self, initial_state=None, load_state=None):
         if initial_state:
             self.state = self.copy_state(initial_state)
         elif load_state:
-            with open(load_state, 'rb') as fh:
-                self.state = pickle.load(fh)
+            self.state = self.load_state(load_state)
         else:
             raise ValueError('No valid values supplied for neither \
             initial_state nor load_state')
@@ -56,12 +61,17 @@ class Annealer(object):
         signal.signal(signal.SIGINT, self.set_user_exit)
 
     def save_state(self, fname=None):
-        """Saves state"""
+        """Saves state to pickle"""
         if not fname:
             date = datetime.datetime.now().strftime("%Y-%m-%dT%Hh%Mm%Ss")
             fname = date + "_energy_" + str(self.energy()) + ".state"
         with open(fname, "wb") as fh:
             pickle.dump(self.state, fh)
+
+    def load_state(self, fname=None):
+        """Loads state from pickle"""
+        with open(fname, 'rb') as fh:
+            self.state = pickle.load(fh)
 
     @abc.abstractmethod
     def move(self):
@@ -136,13 +146,13 @@ class Annealer(object):
             print(' Temperature        Energy    Accept   Improve     Elapsed   Remaining',
                   file=sys.stderr)
             print('\r%12.5f  %12.2f                      %s            ' %
-                  (T, E, time_string(elapsed)), file=sys.stderr, end="\r"),
+                  (T, E, time_string(elapsed)), file=sys.stderr, end="\r")
             sys.stderr.flush()
         else:
             remain = (self.steps - step) * (elapsed / step)
             print('\r%12.5f  %12.2f  %7.2f%%  %7.2f%%  %s  %s\r' %
                   (T, E, 100.0 * acceptance, 100.0 * improvement,
-                   time_string(elapsed), time_string(remain)), file=sys.stderr, end="\r"),
+                   time_string(elapsed), time_string(remain)), file=sys.stderr, end="\r")
             sys.stderr.flush()
 
     def anneal(self):
@@ -203,25 +213,19 @@ class Annealer(object):
                         step, T, E, accepts / trials, improves / trials)
                     trials, accepts, improves = 0, 0, 0
 
-        # line break after progress output
-        print('')
-
         self.state = self.copy_state(self.best_state)
         if self.save_state_on_exit:
             self.save_state()
+
         # Return best state and energy
         return self.best_state, self.best_energy
 
     def auto(self, minutes, steps=2000):
-        """Minimizes the energy of a system by simulated annealing with
-        automatic selection of the temperature schedule.
+        """Explores the annealing landscape and 
+        estimates optimal temperature settings.
 
-        Keyword arguments:
-        state -- an initial arrangement of the system
-        minutes -- time to spend annealing (after exploring temperatures)
-        steps -- number of steps to spend on each stage of exploration
-
-        Returns the best state and energy found."""
+        Returns a dictionary suitable for the `set_schedule` method.
+        """
 
         def run(T, steps):
             """Anneals a system at constant temperature and returns the state,
@@ -230,7 +234,7 @@ class Annealer(object):
             prevState = self.copy_state(self.state)
             prevEnergy = E
             accepts, improves = 0, 0
-            for step in range(steps):
+            for _ in range(steps):
                 self.move()
                 E = self.energy()
                 dE = E - prevEnergy
@@ -286,6 +290,5 @@ class Annealer(object):
         elapsed = time.time() - self.start
         duration = round_figures(int(60.0 * minutes * step / elapsed), 2)
 
-        print('')  # New line after auto() output
         # Don't perform anneal, just return params
-        return {'tmax': Tmax, 'tmin': Tmin, 'steps': duration, 'updates':Annealer.updates}
+        return {'tmax': Tmax, 'tmin': Tmin, 'steps': duration, 'updates': self.updates}
