@@ -288,4 +288,4 @@ class Annealer(object):
 
         print('')  # New line after auto() output
         # Don't perform anneal, just return params
-        return {'tmax': Tmax, 'tmin': Tmin, 'steps': duration}
+        return {'tmax': Tmax, 'tmin': Tmin, 'steps': duration, 'updates':Annealer.updates}
