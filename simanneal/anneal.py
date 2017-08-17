@@ -110,6 +110,10 @@ class Annealer(object):
             return state[:]
         elif self.copy_strategy == 'method':
             return state.copy()
+        else:
+            raise RuntimeError('No implementation found for ' +
+                               'the self.copy_strategy "%s"' %
+                               self.copy_strategy)
 
     def update(self, *args, **kwargs):
         """Wrapper for internal update.
