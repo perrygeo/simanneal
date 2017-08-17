@@ -50,7 +50,7 @@ class Annealer(object):
     start = None
 
     def __init__(self, initial_state=None, load_state=None):
-        if initial_state:
+        if initial_state is not None:
             self.state = self.copy_state(initial_state)
         elif load_state:
             self.state = self.load_state(load_state)
