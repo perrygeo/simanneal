@@ -50,7 +50,7 @@ class Annealer(object):
     start = None
 
     def __init__(self, initial_state=None, load_state=None):
-        if initial_state:
+        if initial_state is not None:
             self.state = self.copy_state(initial_state)
         elif load_state:
             self.state = self.load_state(load_state)
@@ -110,6 +110,10 @@ class Annealer(object):
             return state[:]
         elif self.copy_strategy == 'method':
             return state.copy()
+        else:
+            raise RuntimeError('No implementation found for ' +
+                               'the self.copy_strategy "%s"' %
+                               self.copy_strategy)
 
     def update(self, *args, **kwargs):
         """Wrapper for internal update.
