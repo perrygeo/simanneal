@@ -1,3 +1,7 @@
+### 0.4.1
+- Allow any type of state variable
+- copy_state() should not return None silently
+
 ### 0.4.0
 - Tests running on python{2|3|pypy}
 - fix auto method to return updates (#16)
