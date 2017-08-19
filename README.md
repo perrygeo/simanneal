@@ -1,6 +1,7 @@
 # Python module for simulated annealing
 
 [![Build Status](https://travis-ci.org/perrygeo/simanneal.svg?branch=master)](https://travis-ci.org/perrygeo/simanneal)
+[![PyPI version](https://badge.fury.io/py/simanneal.svg)](https://badge.fury.io/py/simanneal)
 
 This module performs [simulated annealing optimization](http://en.wikipedia.org/wiki/Simulated_annealing) to find the optimal state of a system. It is inspired by the metallurgic process of annealing whereby metals must be cooled at a regular schedule in order to settle into their lowest energy state. 
 
