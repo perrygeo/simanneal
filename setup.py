@@ -31,5 +31,7 @@ setup(
     author_email='perrygeo@gmail.com',
     url='https://github.com/perrygeo/simanneal',
     long_description=LONG_DESCRIPTION,
-    packages=['simanneal'],
-    install_requires=[])
+    packages=['simanneal', 'tests'],
+    install_requires=[],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],)
