@@ -26,7 +26,7 @@ setup(
     name='simanneal',
     version=version,
     description='Simulated Annealing in Python',
-    license='BSD',
+    license='ISC',
     author='Matthew Perry',
     author_email='perrygeo@gmail.com',
     url='https://github.com/perrygeo/simanneal',
