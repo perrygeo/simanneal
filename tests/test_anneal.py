@@ -1,5 +1,6 @@
 import math
 import random
+import tempfile
 
 from helper import distance, cities, distance_matrix
 from simanneal import Annealer
@@ -65,7 +66,7 @@ def test_auto():
     assert tsp.updates == auto_schedule['updates']
 
 
-def test_state(tmpdir):
+def test_state():
     # initial state, a randomly-ordered itinerary
     init_state = list(cities.keys())
     random.shuffle(init_state)
@@ -73,10 +74,10 @@ def test_state(tmpdir):
     tsp = TravellingSalesmanProblem(init_state, distance_matrix)
     tsp.copy_strategy = "slice"
 
-    statefile = str(tmpdir.join("state.pickle"))
-    tsp.save_state(fname=statefile)
+    with tempfile.NamedTemporaryFile('w') as statefile:
+        tsp.save_state(fname=statefile.name)
 
-    tsp2 = TravellingSalesmanProblem(init_state, distance_matrix)
-    tsp2.load_state(fname=statefile)
-    assert tsp.state == tsp2.state
+        tsp2 = TravellingSalesmanProblem(init_state, distance_matrix)
+        tsp2.load_state(fname=statefile.name)
+        assert tsp.state == tsp2.state
     
