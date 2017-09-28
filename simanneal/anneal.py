@@ -169,6 +169,7 @@ class Annealer(object):
         (state, energy): the best state and energy found.
         """
         step = 0
+        self.start = time.time()
         if seed:
             # set random seed
             np.random.seed(seed)
