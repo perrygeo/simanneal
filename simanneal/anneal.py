@@ -173,9 +173,6 @@ class Annealer(object):
             # set random seed
             np.random.seed(seed)
 
-        # set random seed
-        np.random.seed(seed)
-
         # Precompute factor for exponential cooling from Tmax to Tmin
         if self.Tmin <= 0.0:
             raise Exception('Exponential cooling requires a minimum "\
