@@ -7,7 +7,7 @@ import copy
 import datetime
 import math
 import pickle
-import random
+import numpy as np
 import signal
 import sys
 import time
@@ -159,7 +159,7 @@ class Annealer(object):
                    time_string(elapsed), time_string(remain)), file=sys.stderr, end="\r")
             sys.stderr.flush()
 
-    def anneal(self):
+    def anneal(self, seed=None):
         """Minimizes the energy of a system by simulated annealing.
 
         Parameters
@@ -169,7 +169,12 @@ class Annealer(object):
         (state, energy): the best state and energy found.
         """
         step = 0
-        self.start = time.time()
+        if seed:
+            # set random seed
+            np.random.seed(seed)
+
+        # set random seed
+        np.random.seed(seed)
 
         # Precompute factor for exponential cooling from Tmax to Tmin
         if self.Tmin <= 0.0:
@@ -197,7 +202,7 @@ class Annealer(object):
             E = self.energy()
             dE = E - prevEnergy
             trials += 1
-            if dE > 0.0 and math.exp(-dE / T) < random.random():
+            if dE > 0.0 and math.exp(-dE / T) < np.random.random():
                 # Restore previous state
                 self.state = self.copy_state(prevState)
                 E = prevEnergy
@@ -224,12 +229,16 @@ class Annealer(object):
         # Return best state and energy
         return self.best_state, self.best_energy
 
-    def auto(self, minutes, steps=2000):
+    def auto(self, minutes, steps=2000, seed=None):
         """Explores the annealing landscape and 
         estimates optimal temperature settings.
 
         Returns a dictionary suitable for the `set_schedule` method.
         """
+
+        if seed:
+            # set random seed
+            np.random.seed(seed)
 
         def run(T, steps):
             """Anneals a system at constant temperature and returns the state,
@@ -242,7 +251,7 @@ class Annealer(object):
                 self.move()
                 E = self.energy()
                 dE = E - prevEnergy
-                if dE > 0.0 and math.exp(-dE / T) < random.random():
+                if dE > 0.0 and math.exp(-dE / T) < np.random.random():
                     self.state = self.copy_state(prevState)
                     E = prevEnergy
                 else:

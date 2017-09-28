@@ -32,4 +32,4 @@ setup(
     url='https://github.com/perrygeo/simanneal',
     long_description=LONG_DESCRIPTION,
     packages=['simanneal'],
-    install_requires=[])
+    install_requires=['numpy'])
