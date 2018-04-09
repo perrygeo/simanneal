@@ -53,7 +53,7 @@ class Annealer(object):
         if initial_state is not None:
             self.state = self.copy_state(initial_state)
         elif load_state:
-            self.state = self.load_state(load_state)
+            self.load_state(load_state)
         else:
             raise ValueError('No valid values supplied for neither \
             initial_state nor load_state')
@@ -225,7 +225,7 @@ class Annealer(object):
         return self.best_state, self.best_energy
 
     def auto(self, minutes, steps=2000):
-        """Explores the annealing landscape and 
+        """Explores the annealing landscape and
         estimates optimal temperature settings.
 
         Returns a dictionary suitable for the `set_schedule` method.

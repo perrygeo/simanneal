@@ -10,9 +10,10 @@ class TravellingSalesmanProblem(Annealer):
     """
 
     # pass extra data (the distance matrix) into the constructor
-    def __init__(self, state, distance_matrix):
+    def __init__(self, distance_matrix, initial_state=None, load_state=None):
         self.distance_matrix = distance_matrix
-        super(TravellingSalesmanProblem, self).__init__(state)  # important!
+        super(TravellingSalesmanProblem, self).__init__(
+            initial_state=initial_state, load_state=load_state)
 
     def move(self):
         """Swaps two cities in the route."""
@@ -33,7 +34,7 @@ def test_tsp_example():
     init_state = list(cities.keys())
     random.shuffle(init_state)
 
-    tsp = TravellingSalesmanProblem(init_state, distance_matrix)
+    tsp = TravellingSalesmanProblem(distance_matrix, initial_state=init_state)
 
     # since our state is just a list, slice is the fastest way to copy
     tsp.copy_strategy = "slice"
@@ -51,12 +52,12 @@ def test_auto():
     init_state = list(cities.keys())
     random.shuffle(init_state)
 
-    tsp = TravellingSalesmanProblem(init_state, distance_matrix)
+    tsp = TravellingSalesmanProblem(distance_matrix, initial_state=init_state)
 
     # since our state is just a list, slice is the fastest way to copy
     tsp.copy_strategy = "slice"
 
-    auto_schedule = tsp.auto(minutes=0.05) 
+    auto_schedule = tsp.auto(minutes=0.05)
     tsp.set_schedule(auto_schedule)
 
     assert tsp.Tmax == auto_schedule['tmax']
@@ -65,18 +66,36 @@ def test_auto():
     assert tsp.updates == auto_schedule['updates']
 
 
-def test_state(tmpdir):
+def test_save_load_state(tmpdir):
     # initial state, a randomly-ordered itinerary
     init_state = list(cities.keys())
     random.shuffle(init_state)
 
-    tsp = TravellingSalesmanProblem(init_state, distance_matrix)
+    tsp = TravellingSalesmanProblem(distance_matrix, initial_state=init_state)
     tsp.copy_strategy = "slice"
 
     statefile = str(tmpdir.join("state.pickle"))
     tsp.save_state(fname=statefile)
 
-    tsp2 = TravellingSalesmanProblem(init_state, distance_matrix)
+    init_state2 = init_state[1:] + init_state[:1]
+
+    tsp2 = TravellingSalesmanProblem(distance_matrix,
+                                     initial_state=init_state2)
     tsp2.load_state(fname=statefile)
     assert tsp.state == tsp2.state
-    
+
+
+def test_load_state_init(tmpdir):
+    # initial state, a randomly-ordered itinerary
+    init_state = list(cities.keys())
+    random.shuffle(init_state)
+
+    tsp = TravellingSalesmanProblem(distance_matrix, initial_state=init_state)
+    tsp.copy_strategy = "slice"
+
+    statefile = str(tmpdir.join("state.pickle"))
+    tsp.save_state(fname=statefile)
+
+    tsp2 = TravellingSalesmanProblem(distance_matrix, load_state=statefile)
+    assert tsp.state == tsp2.state
+
