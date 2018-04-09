@@ -1,3 +1,6 @@
+### 0.4.2
+- Fix bug in load_state (#23)
+
 ### 0.4.1
 - Allow any type of state variable
 - copy_state() should not return None silently
