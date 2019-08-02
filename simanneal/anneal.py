@@ -193,9 +193,12 @@ class Annealer(object):
         while step < self.steps and not self.user_exit:
             step += 1
             T = self.Tmax * math.exp(Tfactor * step / self.steps)
-            self.move()
-            E = self.energy()
-            dE = E - prevEnergy
+            dE = self.move()
+            if dE is None:
+                E = self.energy()
+                dE = E - prevEnergy
+            else:
+                E += dE
             trials += 1
             if dE > 0.0 and math.exp(-dE / T) < random.random():
                 # Restore previous state

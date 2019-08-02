@@ -135,6 +135,13 @@ them into the constructor like so
 
 The last line (calling init on the super class) is critical. 
 
+## Optimizations
+
+For some problems the `energy` function is prohibitively expensive to calculate
+after every move. It is often possible to compute the change in energy that a
+move causes much more efficiently. A delta value can be returned from `move` to
+update the energy value without calling `energy` multiple times.
+
 ## Implementation Details
 
 The simulated annealing algorithm requires that we track state (current, previous, best) and thus means we need to copy the `self.state` frequently.
