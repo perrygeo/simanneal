@@ -1,3 +1,6 @@
+### 0.5.0
+- Allow move function to return energy delta for efficiency gains in some cases (#28)
+
 ### 0.4.2
 - Fix bug in load_state (#23)
 
