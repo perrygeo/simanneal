@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import print_function
 import math
 import random
@@ -28,6 +29,8 @@ class TravellingSalesmanProblem(Annealer):
         a = random.randint(0, len(self.state) - 1)
         b = random.randint(0, len(self.state) - 1)
         self.state[a], self.state[b] = self.state[b], self.state[a]
+        # no efficiency gain, just proof of concept
+        return self.energy()
 
     def energy(self):
         """Calculates the length of the route."""
@@ -35,7 +38,6 @@ class TravellingSalesmanProblem(Annealer):
         for i in range(len(self.state)):
             e += self.distance_matrix[self.state[i-1]][self.state[i]]
         return e
-
 
 
 if __name__ == '__main__':
@@ -79,7 +81,7 @@ if __name__ == '__main__':
                 distance_matrix[ka][kb] = distance(va, vb)
 
     tsp = TravellingSalesmanProblem(init_state, distance_matrix)
-    tsp.steps = 100000
+    tsp.set_schedule(tsp.auto(minutes=0.2))
     # since our state is just a list, slice is the fastest way to copy
     tsp.copy_strategy = "slice"
     state, e = tsp.anneal()
@@ -89,5 +91,4 @@ if __name__ == '__main__':
 
     print()
     print("%i mile route:" % e)
-    for city in state:
-        print("\t", city)
+    print(" ➞  ".join(state))
