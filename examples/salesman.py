@@ -26,11 +26,15 @@ class TravellingSalesmanProblem(Annealer):
 
     def move(self):
         """Swaps two cities in the route."""
+        # no efficiency gain, just proof of concept
+        # demonstrates returning the delta energy (optional)
+        initial_energy = self.energy()
+
         a = random.randint(0, len(self.state) - 1)
         b = random.randint(0, len(self.state) - 1)
         self.state[a], self.state[b] = self.state[b], self.state[a]
-        # no efficiency gain, just proof of concept
-        return self.energy()
+
+        return self.energy() - initial_energy
 
     def energy(self):
         """Calculates the length of the route."""
