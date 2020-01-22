@@ -118,13 +118,13 @@ def test_default_update_formatting():
     sys.stderr = StringIO()
     tsp.default_update(0, 1, 2, 3, 4)
     output = sys.stderr.getvalue().split('\n')
-    assert len(output) == 2
-    assert output[0] ==   ' Temperature        Energy    Accept   Improve     Elapsed   Remaining'
-    assert output[1] == '\r     1.00000          2.00                         0:00:08            \r'
+    assert len(output) == 3
+    assert output[1] ==   ' Temperature        Energy    Accept   Improve     Elapsed   Remaining'
+    assert output[2] == '\r     1.00000          2.00                         0:00:08            '
 
     # when step>0, default_update should use \r to overwrite the previous data
     sys.stderr = StringIO()
     tsp.default_update(10, 1, 2, 3, 4)
     output = sys.stderr.getvalue().split('\n')
     assert len(output) == 1
-    assert output[0] == '\r     1.00000          2.00   300.00%   400.00%     0:00:08    11:06:32\r\r'
+    assert output[0] == '\r     1.00000          2.00   300.00%   400.00%     0:00:08    11:06:32'
