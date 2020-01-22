@@ -38,7 +38,7 @@ To put it in terms of our simulated annealing framework:
 ## Quickstart
 
 Install it first
-```
+```bash
 pip install simanneal  # from pypi
 
 pip install -e git+https://github.com/perrygeo/simanneal.git  # latest from github
@@ -46,7 +46,7 @@ pip install -e git+https://github.com/perrygeo/simanneal.git  # latest from gith
 
 To define our problem, we create a class that inherits from `simanneal.Annealer`
 
-```
+```python
 from simanneal import Annealer
 class TravellingSalesmanProblem(Annealer):
     """Test annealer with a travelling salesman problem."""
@@ -54,7 +54,7 @@ class TravellingSalesmanProblem(Annealer):
 
 Within that class, we define two required methods. First, we define the move:
 
-```
+```python
     def move(self):
         """Swaps two cities in the route."""
         a = random.randint(0, len(self.state) - 1)
@@ -63,7 +63,7 @@ Within that class, we define two required methods. First, we define the move:
 ```
 
 Then we define how energy is computed (also known as the *objective function*):
-```
+```python
     def energy(self):
         """Calculates the length of the route."""
         e = 0
@@ -77,13 +77,13 @@ Note that both of these methods have access to `self.state` which tracks the cur
 
 So with our problem specified, we can construct a ` TravellingSalesmanProblem` instance and provide it a starting state
 
-```
+```python
 initial_state = ['New York', 'Los Angeles', 'Boston', 'Houston']
 tsp = TravellingSalesmanProblem(initial_state)
 ```
 
 And run it
-```
+```python
 itinerary, miles = tsp.anneal()
 ```
 
@@ -92,12 +92,12 @@ See [examples/salesman.py](https://github.com/perrygeo/simanneal/blob/master/exa
 ## Annealing parameters
 
 Getting the annealing algorithm to work effectively and quickly is a matter of tuning parameters. The defaults are:
-
-    Tmax = 25000.0  # Max (starting) temperature
-    Tmin = 2.5      # Min (ending) temperature
-    steps = 50000   # Number of iterations
-    updates = 100   # Number of updates (by default an update prints to stdout)
-
+```python
+Tmax = 25000.0  # Max (starting) temperature
+Tmin = 2.5      # Min (ending) temperature
+steps = 50000   # Number of iterations
+updates = 100   # Number of updates (by default an update prints to stdout)
+```
 These can vary greatly depending on your objective function and solution space.
 
  A good rule of thumb is that your initial temperature `Tmax` should be set to accept roughly 98% of the moves and that the final temperature `Tmin` should be low enough that the solution does not improve much, if at all. 
@@ -107,13 +107,13 @@ The number of `steps` can influence the results; if there are not enough iterati
 The number of updates doesn't affect the results but can be useful for examining the progress. The default update method (`Annealer.update`) prints a table to stdout and includes the current temperature, state energy, the percentage of moves accepted and improved and elapsed and remaining time. You can override `.update` and provide your own custom reporting mechanism to e.g. graphically plot the progress.
 
 If you want to specify them manually, the are just attributes of the `Annealer` instance. 
-```
+```python
 tsp.Tmax = 12000.0
 ...
 ```
 However, you can use the `.auto` method which attempts to explore the search space to determine some decent starting values and assess how long each iteration takes. This allows you to specify roughly how long you're willing to wait for results.
 
-```
+```python
 auto_schedule = tsp.auto(minutes=1) 
 # {'tmin': ..., 'tmax': ..., 'steps': ...}
 
