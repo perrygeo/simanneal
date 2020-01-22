@@ -7,7 +7,7 @@ This module performs [simulated annealing optimization](http://en.wikipedia.org/
 
 Simulated annealing is used to find a close-to-optimal solution among an extremely large (but finite) set of potential solutions. It is particularly useful for [combinatorial optimization](http://en.wikipedia.org/wiki/Combinatorial_optimization) problems defined by complex objective functions that rely on external data. 
 
-The process involves::
+The process involves:
 
 1. Randomly **move** or alter the **state** 
 2. Assess the **energy** of the new state using an objective function
@@ -17,7 +17,7 @@ The process involves::
 4. Repeat until you have converged on an acceptable answer
 
 
-For a move to be accepted, it must meet one of two requirements
+For a move to be accepted, it must meet one of two requirements:
 
 * The move causes a decrease in state energy (i.e. an improvement in the objective function)
 * The move increases the state energy (i.e. a slightly worse solution) but is within the bounds of the temperature. The temperature exponetially decreases as the algorithm progresses. In this way, we avoid getting trapped by local minima early in the process but start to hone in on a viable solution by the end. 
