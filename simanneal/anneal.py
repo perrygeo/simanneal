@@ -147,16 +147,24 @@ class Annealer(object):
 
         elapsed = time.time() - self.start
         if step == 0:
-            print(' Temperature        Energy    Accept   Improve     Elapsed   Remaining',
+            print('\n Temperature        Energy    Accept   Improve     Elapsed   Remaining',
                   file=sys.stderr)
-            print('\r%12.5f  %12.2f                      %s            ' %
-                  (T, E, time_string(elapsed)), file=sys.stderr, end="\r")
+            print('\r{Temp:12.5f}  {Energy:12.2f}                      {Elapsed:s}            '
+                  .format(Temp=T,
+                          Energy=E,
+                          Elapsed=time_string(elapsed)),
+                  file=sys.stderr, end="")
             sys.stderr.flush()
         else:
             remain = (self.steps - step) * (elapsed / step)
-            print('\r%12.5f  %12.2f  %7.2f%%  %7.2f%%  %s  %s\r' %
-                  (T, E, 100.0 * acceptance, 100.0 * improvement,
-                   time_string(elapsed), time_string(remain)), file=sys.stderr, end="\r")
+            print('\r{Temp:12.5f}  {Energy:12.2f}   {Accept:7.2%}   {Improve:7.2%}  {Elapsed:s}  {Remaining:s}'
+                  .format(Temp=T,
+                          Energy=E,
+                          Accept=acceptance,
+                          Improve=improvement,
+                          Elapsed=time_string(elapsed),
+                          Remaining=time_string(remain)),
+                  file=sys.stderr, end="")
             sys.stderr.flush()
 
     def anneal(self):

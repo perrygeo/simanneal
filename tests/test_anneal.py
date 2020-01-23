@@ -1,8 +1,14 @@
-import math
 import random
+import sys
+import time
 
 from helper import distance, cities, distance_matrix
 from simanneal import Annealer
+
+if sys.version_info.major >= 3:  # pragma: no cover
+    from io import StringIO
+else:
+    from StringIO import StringIO
 
 
 class TravellingSalesmanProblem(Annealer):
@@ -99,3 +105,26 @@ def test_load_state_init(tmpdir):
     tsp2 = TravellingSalesmanProblem(distance_matrix, load_state=statefile)
     assert tsp.state == tsp2.state
 
+
+def test_default_update_formatting():
+    init_state = list(cities.keys())
+    tsp = TravellingSalesmanProblem(distance_matrix, initial_state=init_state)
+
+    # fix the start time and patch time.time() to give predictable Elapsed and Remaining times
+    tsp.start = 1.0
+    time.time = lambda: 9.0
+
+    # for step=0, the output should be column headers followed by partial data
+    sys.stderr = StringIO()
+    tsp.default_update(0, 1, 2, 3, 4)
+    output = sys.stderr.getvalue().split('\n')
+    assert 3 == len(output)
+    assert   ' Temperature        Energy    Accept   Improve     Elapsed   Remaining' == output[1]
+    assert '\r     1.00000          2.00                         0:00:08            ' == output[2]
+
+    # when step>0, default_update should use \r to overwrite the previous data
+    sys.stderr = StringIO()
+    tsp.default_update(10, 1, 2, 3, 4)
+    output = sys.stderr.getvalue().split('\n')
+    assert 1 == len(output)
+    assert '\r     1.00000          2.00   300.00%   400.00%     0:00:08    11:06:32' == output[0]
