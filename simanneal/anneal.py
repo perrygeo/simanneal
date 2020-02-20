@@ -250,9 +250,12 @@ class Annealer(object):
             prevEnergy = E
             accepts, improves = 0, 0
             for _ in range(steps):
-                self.move()
-                E = self.energy()
-                dE = E - prevEnergy
+                dE = self.move()
+                if dE is None:
+                    E = self.energy()
+                    dE = E - prevEnergy
+                else:
+                    E = prevEnergy + dE
                 if dE > 0.0 and math.exp(-dE / T) < random.random():
                     self.state = self.copy_state(prevState)
                     E = prevEnergy
