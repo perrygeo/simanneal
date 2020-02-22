@@ -250,9 +250,12 @@ class Annealer(object):
             prevEnergy = E
             accepts, improves = 0, 0
             for _ in range(steps):
-                self.move()
-                E = self.energy()
-                dE = E - prevEnergy
+                dE = self.move()
+                if dE is None:
+                    E = self.energy()
+                    dE = E - prevEnergy
+                else:
+                    E = prevEnergy + dE
                 if dE > 0.0 and math.exp(-dE / T) < random.random():
                     self.state = self.copy_state(prevState)
                     E = prevEnergy
@@ -274,8 +277,11 @@ class Annealer(object):
         self.update(step, T, E, None, None)
         while T == 0.0:
             step += 1
-            self.move()
-            T = abs(self.energy() - E)
+            dE = self.move()
+            if dE is None:
+                T = abs(self.energy() - E)
+            else:
+                T = abs(dE)
 
         # Search for Tmax - a temperature that gives 98% acceptance
         E, acceptance, improvement = run(T, steps)
