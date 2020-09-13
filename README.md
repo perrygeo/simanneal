@@ -133,18 +133,25 @@ them into the constructor like so
         self.distance_matrix = distance_matrix
         super(TravellingSalesmanProblem, self).__init__(state)  # important!
 
-The last line (calling init on the super class) is critical. 
+The last line (calling `__init__` on the super class) is critical.
 
 ## Optimizations
 
 For some problems the `energy` function is prohibitively expensive to calculate
 after every move. It is often possible to compute the change in energy that a
-move causes much more efficiently. A delta value can be returned from `move` to
-update the energy value without calling `energy` multiple times.
+move causes much more efficiently.
+
+For this reason, a non-`None` value returned from `move` will be treated as
+a delta and added to the previous energy value to get the energy value for
+the current move. If your model allows you to cheaply calculate a change in
+energy from the previous state, this approach will save you a call to
+`energy`. It is fine for the `move` operation to sometimes return a delta
+value and sometimes return `None`, depending on the type of modification it
+makes to the state and the complexity of calculting a delta.
 
 ## Implementation Details
 
-The simulated annealing algorithm requires that we track state (current, previous, best) and thus means we need to copy the `self.state` frequently.
+The simulated annealing algorithm requires that we track states (current, previous, best), which means we need to copy `self.state` frequently.
 
 Copying an object in Python is not always straightforward or performant. The standard library provides a `copy.deepcopy()` method to copy arbitrary python objects but it is very expensive. Certain objects can be copied by more efficient means: lists can be sliced and dictionaries can use their own .copy method, etc.
 
@@ -154,14 +161,14 @@ which defines one of:
 * `slice`: uses `object[:]`
 * `method`: uses `object.copy()`
 
-If you want to implement your own custom copy mechanism, you can override the `copy_state` method.
+If you want to implement your own custom copy mechanism, override the `copy_state` method.
 
 ## Notes
 
 1. Thanks to Richard J. Wagner at University of Michigan for writing and contributing the bulk of this code.
 2. Some effort has been made to increase performance but this is nowhere near as fast as optimized solutions written in other low-level languages. On the other hand, this is a very flexible, Python-based solution that can be used for rapidly 
 experimenting with a computational problem with minimal overhead. 
-3. Using PyPy instead of CPython can yield substantial increases in performance.
+3. Using [PyPy](https://www.pypy.org/) instead of CPython can yield substantial increases in performance.
 4. For certain problems, there are simulated annealing techniques that are highly customized and optimized for the particular domain
     * For conservation planning, check out [Marxan](http://www.uq.edu.au/marxan/) which is designed to prioritize conservation resources according to multiple planning objectives
     * For forest management and timber harvest scheduling, check out [Harvest Scheduler](https://github.com/Ecotrust/harvest-scheduler) which optimizes forestry operations over space and time to meet multiple objectives. 
