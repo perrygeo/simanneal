@@ -278,7 +278,9 @@ class Annealer(object):
         while T == 0.0:
             step += 1
             dE = self.move()
-            T = abs(self.energy() - E if dE is None else dE)
+            if dE is None:
+                dE = self.energy() - E
+            T = abs(dE)
 
         # Search for Tmax - a temperature that gives 98% acceptance
         E, acceptance, improvement = run(T, steps)
