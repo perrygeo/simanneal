@@ -100,7 +100,7 @@ class Annealer(object):
         """Returns an exact copy of the provided state
         Implemented according to self.copy_strategy, one of
 
-        * deepcopy : use copy.deepcopy (slow but reliable)
+        * deepcopy: use copy.deepcopy (slow but reliable)
         * slice: use list slices (faster but only works if state is list-like)
         * method: use the state's copy() method
         """
@@ -192,7 +192,7 @@ class Annealer(object):
         prevEnergy = E
         self.best_state = self.copy_state(self.state)
         self.best_energy = E
-        trials, accepts, improves = 0, 0, 0
+        trials = accepts = improves = 0
         if self.updates > 0:
             updateWavelength = self.steps / self.updates
             self.update(step, T, E, None, None)
@@ -226,7 +226,7 @@ class Annealer(object):
                 if (step // updateWavelength) > ((step - 1) // updateWavelength):
                     self.update(
                         step, T, E, accepts / trials, improves / trials)
-                    trials, accepts, improves = 0, 0, 0
+                    trials = accepts = improves = 0
 
         self.state = self.copy_state(self.best_state)
         if self.save_state_on_exit:
@@ -279,9 +279,8 @@ class Annealer(object):
             step += 1
             dE = self.move()
             if dE is None:
-                T = abs(self.energy() - E)
-            else:
-                T = abs(dE)
+                dE = self.energy() - E
+            T = abs(dE)
 
         # Search for Tmax - a temperature that gives 98% acceptance
         E, acceptance, improvement = run(T, steps)

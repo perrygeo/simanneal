@@ -2,6 +2,7 @@
 from __future__ import print_function
 import math
 import random
+from collections import defaultdict
 from simanneal import Annealer
 
 
@@ -71,18 +72,14 @@ if __name__ == '__main__':
     }
 
     # initial state, a randomly-ordered itinerary
-    init_state = list(cities.keys())
+    init_state = list(cities)
     random.shuffle(init_state)
 
     # create a distance matrix
-    distance_matrix = {}
+    distance_matrix = defaultdict(dict)
     for ka, va in cities.items():
-        distance_matrix[ka] = {}
         for kb, vb in cities.items():
-            if kb == ka:
-                distance_matrix[ka][kb] = 0.0
-            else:
-                distance_matrix[ka][kb] = distance(va, vb)
+            distance_matrix[ka][kb] = 0.0 if kb == ka else distance(va, vb)
 
     tsp = TravellingSalesmanProblem(init_state, distance_matrix)
     tsp.set_schedule(tsp.auto(minutes=0.2))
