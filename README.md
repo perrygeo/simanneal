@@ -68,7 +68,7 @@ Then we define how energy is computed (also known as the *objective function*):
         """Calculates the length of the route."""
         e = 0
         for i in range(len(self.state)):
-            e += self.distance(cities[self.state[i - 1]],
+            e += self.distance_matrix(cities[self.state[i - 1]],
                           cities[self.state[i]])
         return e
 ```
