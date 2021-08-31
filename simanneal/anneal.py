@@ -11,12 +11,13 @@ import random
 import signal
 import sys
 import time
+import matplotlib.pyplot as plt
+
 
 
 def round_figures(x, n):
     """Returns x rounded to n significant figures."""
     return round(x, int(n - math.ceil(math.log10(abs(x)))))
-
 
 def time_string(seconds):
     """Returns time in seconds as a string formatted HHHH:MM:SS."""
@@ -24,7 +25,6 @@ def time_string(seconds):
     h, s = divmod(s, 3600)   # get hours and remainder
     m, s = divmod(s, 60)     # split remainder into minutes and seconds
     return '%4i:%02i:%02i' % (h, m, s)
-
 
 class Annealer(object):
 
@@ -50,6 +50,12 @@ class Annealer(object):
     start = None
 
     def __init__(self, initial_state=None, load_state=None):
+
+        self.energy_list = []
+        self.initial_energy = None
+        self.vis = True
+        self.save = True
+
         if initial_state is not None:
             self.state = self.copy_state(initial_state)
         elif load_state:
@@ -57,7 +63,6 @@ class Annealer(object):
         else:
             raise ValueError('No valid values supplied for neither \
             initial_state nor load_state')
-
         signal.signal(signal.SIGINT, self.set_user_exit)
 
     def save_state(self, fname=None):
@@ -72,6 +77,27 @@ class Annealer(object):
         """Loads state from pickle"""
         with open(fname, 'rb') as fh:
             self.state = pickle.load(fh)
+
+    def save_plot(self, fname=None):
+        """Saves progress plot"""
+
+        if not fname:
+            date = datetime.datetime.now().strftime("%Y-%m-%dT%Hh%Mm%Ss")
+            fname = date 
+
+        print(len(self.energy_list))
+        fig = plt.figure(figsize=(10,8))
+        plt.plot([i for i in range(len(self.energy_list))], self.energy_list)
+        initial = plt.axhline(y=self.initial_energy, color='r', linestyle='--')
+        final = plt.axhline(y=self.initial_energy, color='g', linestyle='--')
+        plt.legend( [ initial , final ] , ['Initial Energy', 'Final Energy'])
+        plt.ylabel('State Energy')
+        plt.xlabel('Iteration')
+
+        if self.save:
+            fig.savefig( 'progress.png', bbox_inches='tight')
+
+        plt.show()
 
     @abc.abstractmethod
     def move(self):
@@ -123,7 +149,7 @@ class Annealer(object):
         from your own Annealer.
         """
         self.default_update(*args, **kwargs)
-
+        
     def default_update(self, step, T, E, acceptance, improvement):
         """Default update, outputs to stderr.
 
@@ -144,6 +170,8 @@ class Annealer(object):
         it will tend toward zero as the moves that can decrease the energy
         are exhausted and moves that would increase the energy are no longer
         thermally accessible."""
+
+        self.energy_list.append(E)
 
         elapsed = time.time() - self.start
         if step == 0:
@@ -188,6 +216,8 @@ class Annealer(object):
         # Note initial state
         T = self.Tmax
         E = self.energy()
+        self.initial_energy = E
+
         prevState = self.copy_state(self.state)
         prevEnergy = E
         self.best_state = self.copy_state(self.state)
@@ -229,8 +259,12 @@ class Annealer(object):
                     trials = accepts = improves = 0
 
         self.state = self.copy_state(self.best_state)
+
         if self.save_state_on_exit:
             self.save_state()
+
+        if self.vis:
+            self.save_plot()
 
         # Return best state and energy
         return self.best_state, self.best_energy
